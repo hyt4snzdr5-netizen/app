@@ -816,6 +816,37 @@
                 console.error('❌ Ошибка при активации обновления:', e);
             }
         }, 500);
+        
+        // ДОПОЛНИТЕЛЬНО: при входе показывать новости
+        // Перехватываем функцию enterApp (если она определена)
+        const originalEnterApp = window.enterApp;
+        if (originalEnterApp) {
+            window.enterApp = function(role) {
+                originalEnterApp(role);
+                setTimeout(() => {
+                    // После выбора роли переключаем на новости
+                    const newsSection = document.getElementById('section-news');
+                    if (newsSection) {
+                        document.querySelectorAll('.app-content .section').forEach(s => s.classList.remove('active'));
+                        newsSection.classList.add('active');
+                        showToast('📰 Добро пожаловать в новости ЦМТО');
+                    }
+                }, 400);
+            };
+        }
+
+        // Если пользователь уже авторизован и выбрана роль, но новости не показаны
+        if (currentUser && currentUser.role) {
+            setTimeout(() => {
+                const newsSection = document.getElementById('section-news');
+                if (newsSection) {
+                    document.querySelectorAll('.app-content .section').forEach(s => s.classList.remove('active'));
+                    newsSection.classList.add('active');
+                    console.log('📰 Новости активированы автоматически');
+                }
+            }, 600);
+        }
+
     }
 
     runUpdate();
