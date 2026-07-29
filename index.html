@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>ЦМТО Кунцево PRO - Приложение</title>
+    <style>
+        /* ============================================
+           БАЗОВЫЕ СТИЛИ
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --blue: #004b87;
+            --blue-light: #1683d8;
+            --blue-dark: #00315e;
+            --blue-glow: rgba(22, 131, 216, 0.15);
+            --gold: #f5a623;
+            --green: #27ae60;
+            --red: #e74c3c;
+            --orange: #f39c12;
+            --bg: #f0f4fa;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --transition: 0.3s ease;
+        }
+
+        body {
+            font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: #1a2634;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           ЭКРАН РЕГИСТРАЦИИ / ВХОДА
+           ============================================ */
+        #authScreen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #00264d, #004b87, #1683d8);
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 40px 30px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .auth-container .logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--blue);
+            margin-bottom: 8px;
+        }
+
+        .auth-container .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        .auth-container .logo span {
+            color: var(--gold);
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: #f0f4fa;
+            border-radius: 12px;
+            padding: 4px;
+        }
+
+        .auth-tabs button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            background: transparent;
+            color: #888;
+        }
+
+        .auth-tabs button.active {
+            background: var(--white);
+            color: var(--blue);
+            box-shadow: var(--shadow);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-form label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e8ecf0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: var(--transition);
+            margin-bottom: 16px;
+            background: #f8fafc;
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: var(--blue-light);
+            background: var(--white);
+        }
+
+        .auth-form .code-input {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .auth-form .code-input input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .auth-form .code-input button {
+            padding: 14px 20px;
+            background: var(--blue-light);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .auth-form .code-input button:active {
+            transform: scale(0.95);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+
+        .auth-btn:active {
+            transform: scale(0.97);
+        }
+
+        .auth-error {
+            color: var(--red);
+            font-size: 13px;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+        }
+
+        /* ============================================
+           ГЛАВНОЕ ПРИЛОЖЕНИЕ
+           ============================================ */
+        #app {
+            display: none;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Верхняя панель */
+        .app-header {
+            background: var(--white);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-header .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--blue-light);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .app-header .user-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--blue);
+        }
+
+        .app-header .user-role {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .app-header .logout-btn {
+            padding: 8px 16px;
+            background: #fee;
+            color: var(--red);
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Выбор роли */
+        #roleSelection {
+            display: none;
+            padding: 30px 20px;
+        }
+
+        #roleSelection h2 {
+            text-align: center;
+            color: var(--blue);
+            margin-bottom: 25px;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .role-card {
+            background: var(--white);
+            padding: 25px 15px;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .role-card:active {
+            transform: scale(0.95);
+        }
+
+        .role-card .role-icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .role-card .role-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--blue);
+        }
+
+        .role-card.selected {
+            border-color: var(--blue-light);
+            background: #f0f8ff;
+        }
+
+        /* ============================================
+           ОСНОВНЫЕ РАЗДЕЛЫ
+           ============================================ */
+        .app-content {
+            padding: 20px;
+        }
+
+        .app-content .section {
+            display: none;
+        }
+
+        .app-content .section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: var(--blue);
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        /* ============================================
+           ЧАТЫ
+           ============================================ */
+        .chat-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-item {
+            background: var(--white);
+            padding: 16px 18px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chat-item:active {
+            transform: scale(0.97);
+        }
+
+        .chat-item .chat-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .chat-item .chat-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--blue-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .chat-item .chat-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #1a2634;
+        }
+
+        .chat-item .chat-last {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .chat-item .chat-badge {
+            background: var(--red);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Окно чата */
+        .chat-window {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            z-index: 200;
+            flex-direction: column;
+        }
+
+        .chat-window.open {
+            display: flex;
+        }
+
+        .chat-window-header {
+            background: var(--white);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        }
+
+        .chat-window-header .back-btn {
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px 8px;
+        }
+
+        .chat-window-header .chat-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--blue);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-msg {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .chat-msg.sent {
+            background: var(--blue);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-msg.received {
+            background: var(--white);
+            color: #1a2634;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            box-shadow: var(--shadow);
+        }
+
+        .chat-msg .msg-time {
+            font-size: 11px;
+            opacity: 0.6;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .chat-input-area {
+            background: var(--white);
+            padding: 12px 16px;
+            display: flex;
+            gap: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e8ecf0;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #f8fafc;
+        }
+
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: var(--blue-light);
+        }
+
+        .chat-input-area .send-btn {
+            padding: 12px 24px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* ============================================
+           ЗАЯВКИ
+           ============================================ */
+        .request-card {
+            background: var(--white);
+            padding: 18px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 14px;
+            border-left: 4px solid var(--blue-light);
+        }
+
+        .request-card .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .request-card .request-id {
+            font-weight: 700;
+            color: var(--blue);
+            font-size: 14px;
+        }
+
+        .request-card .request-status {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .request-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .request-status.processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .request-status.signed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .request-status.assembling {
+            background: #d6d8db;
+            color: #383d41;
+        }
+        .request-status.shipped {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .request-status.done {
+            background: #28a745;
+            color: white;
+        }
+        .request-status.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .request-card .request-material {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a2634;
+        }
+
+        .request-card .request-details {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .request-card .request-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .request-card .request-actions button {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .request-card .request-actions button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: white;
+        }
+        .btn-success {
+            background: var(--green);
+            color: white;
+        }
+        .btn-warning {
+            background: var(--orange);
+            color: white;
+        }
+        .btn-danger {
+            background: var(--red);
+            color: white;
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--blue);
+            border: 2px solid var(--blue) !important;
+        }
+
+        /* ============================================
+           СКЛАД (Расход/Приход)
+           ============================================ */
+        .material-item {
+            background: var(--white);
+            padding: 16px 18px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .material-item .mat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .material-item .mat-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #1a2634;
+        }
+
+        .material-item .mat-quantity {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .material-item .mat-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .material-item .mat-actions button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .material-item .mat-actions button:active {
+            transform: scale(0.95);
+        }
+
+        /* ============================================
+           ФОРМА СОЗДАНИЯ ЗАЯВКИ
+           ============================================ */
+        .request-form {
+            background: var(--white);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .request-form label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .request-form input,
+        .request-form select,
+        .request-form textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e8ecf0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: var(--transition);
+            margin-bottom: 14px;
+            background: #f8fafc;
+            font-family: inherit;
+        }
+
+        .request-form input:focus,
+        .request-form select:focus,
+        .request-form textarea:focus {
+            outline: none;
+            border-color: var(--blue-light);
+            background: var(--white);
+        }
+
+        .request-form textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .request-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .request-form .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .request-form .submit-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* ============================================
+           СТАТУСЫ ПОСТАВОК (для начальника склада)
+           ============================================ */
+        .supply-item {
+            background: var(--white);
+            padding: 16px 18px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+        }
+
+        .supply-item .supply-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .supply-item .supply-name {
+            font-weight: 700;
+            color: var(--blue);
+        }
+
+        .supply-item .supply-status {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .supply-item .supply-details {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* ============================================
+           ЛИНИЯ (для диспетчера)
+           ============================================ */
+        .line-item {
+            background: var(--white);
+            padding: 16px 18px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+            border-left: 4px solid var(--gold);
+        }
+
+        .line-item .line-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .line-item .line-material {
+            font-weight: 700;
+            color: var(--blue);
+        }
+
+        .line-item .line-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .line-item .line-actions button {
+            padding: 4px 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        /* ============================================
+           НИЖНЯЯ НАВИГАЦИЯ
+           ============================================ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 14px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+            z-index: 100;
+        }
+
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            padding: 4px 12px;
+            border: none;
+            background: none;
+            font-size: 12px;
+            color: #999;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .bottom-nav .nav-item .nav-icon {
+            font-size: 22px;
+        }
+
+        .bottom-nav .nav-item.active {
+            color: var(--blue);
+        }
+
+        .bottom-nav .nav-item.active .nav-icon {
+            color: var(--blue);
+        }
+
+        /* ============================================
+           АНИМАЦИИ
+           ============================================ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.4s ease;
+        }
+
+        /* ============================================
+           АДАПТИВНОСТЬ
+           ============================================ */
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 30px 20px;
+            }
+
+            .role-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .role-card {
+                padding: 18px 10px;
+            }
+
+            .role-card .role-icon {
+                font-size: 30px;
+            }
+
+            .request-form .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .material-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .material-item .mat-actions {
+                justify-content: flex-start;
+            }
+
+            .chat-msg {
+                max-width: 90%;
+            }
+
+            .bottom-nav .nav-item {
+                font-size: 10px;
+                padding: 2px 8px;
+            }
+
+            .bottom-nav .nav-item .nav-icon {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .role-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .app-header .user-name {
+                font-size: 13px;
+            }
+
+            .app-header .logout-btn {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+    ЭКРАН АВТОРИЗАЦИИ
+    ============================================ -->
+    <div id="authScreen">
+        <div class="auth-container">
+            <div class="logo">ЦМТО <span>PRO</span></div>
+            <div class="subtitle">ГБУ «Жилищник района Кунцево»</div>
+
+            <div class="auth-tabs">
+                <button class="active" data-tab="login">Вход</button>
+                <button data-tab="register">Регистрация</button>
+            </div>
+
+            <!-- ВХОД -->
+            <div class="auth-form active" id="loginForm">
+                <label>Телефон или Email</label>
+                <input type="text" id="loginPhone" placeholder="+7 (___) ___-__-__ или email@mail.ru">
+
+                <button class="auth-btn" onclick="handleLogin()">Продолжить</button>
+                <div class="auth-error" id="loginError">Неверный формат. Введите телефон или email.</div>
+            </div>
+
+            <!-- РЕГИСТРАЦИЯ -->
+            <div class="auth-form" id="registerForm">
+                <label>Телефон или Email</label>
+                <input type="text" id="regPhone" placeholder="+7 (___) ___-__-__ или email@mail.ru">
+
+                <div class="code-input">
+                    <input type="text" id="regCode" placeholder="Код из SMS" maxlength="6">
+                    <button onclick="sendCode()">Получить код</button>
+                </div>
+
+                <button class="auth-btn" onclick="handleRegister()">Зарегистрироваться</button>
+                <div class="auth-error" id="regError">Заполните все поля и получите код.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    ГЛАВНОЕ ПРИЛОЖЕНИЕ
+    ============================================ -->
+    <div id="app">
+
+        <!-- Верхняя панель -->
+        <header class="app-header">
+            <div class="user-info">
+                <div class="avatar" id="userAvatar">👤</div>
+                <div>
+                    <div class="user-name" id="userName">Пользователь</div>
+                    <div class="user-role" id="userRole">Роль не выбрана</div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">Выйти</button>
+        </header>
+
+        <!-- ВЫБОР РОЛИ -->
+        <div id="roleSelection">
+            <h2>Выберите вашу роль</h2>
+            <div class="role-grid" id="roleGrid">
+                <div class="role-card" data-role="director">
+                    <span class="role-icon">👔</span>
+                    <span class="role-name">Директор</span>
+                </div>
+                <div class="role-card" data-role="dispatcher">
+                    <span class="role-icon">📡</span>
+                    <span class="role-name">Диспетчер</span>
+                </div>
+                <div class="role-card" data-role="warehouse">
+                    <span class="role-icon">📦</span>
+                    <span class="role-name">Начальник склада</span>
+                </div>
+                <div class="role-card" data-role="site">
+                    <span class="role-icon">🔧</span>
+                    <span class="role-name">Начальник участка</span>
+                </div>
+                <div class="role-card" data-role="gbuz">
+                    <span class="role-icon">🏛️</span>
+                    <span class="role-name">ГБУ Жилищник</span>
+                </div>
+                <div class="role-card" data-role="stock">
+                    <span class="role-icon">🏚️</span>
+                    <span class="role-name">Склад</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <div class="app-content" id="appContent">
+            <!-- ===== РАЗДЕЛ ДИРЕКТОРА ===== -->
+            <div class="section" id="section-director">
+                <h2 class="section-title">👔 Панель директора</h2>
+                <div id="directorContent">
+                    <div class="chat-list" id="directorChats">
+                        <div class="chat-item" onclick="openChat('director', 'Диспетчер')">
+                            <div class="chat-info">
+                                <div class="chat-avatar">📡</div>
+                                <div>
+                                    <div class="chat-name">Диспетчер</div>
+                                    <div class="chat-last">Чат с диспетчером</div>
+                                </div>
+                            </div>
+                            <span class="chat-badge">3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== РАЗДЕЛ ДИСПЕТЧЕРА ===== -->
+            <div class="section" id="section-dispatcher">
+                <h2 class="section-title">📡 Диспетчерская</h2>
+                <div id="dispatcherContent"></div>
+            </div>
+
+            <!-- ===== РАЗДЕЛ НАЧАЛЬНИКА СКЛАДА ===== -->
+            <div class="section" id="section-warehouse">
+                <h2 class="section-title">📦 Начальник склада</h2>
+                <div id="warehouseContent"></div>
+            </div>
+
+            <!-- ===== РАЗДЕЛ НАЧАЛЬНИКА УЧАСТКА ===== -->
+            <div class="section" id="section-site">
+                <h2 class="section-title">🔧 Начальник участка</h2>
+                <div id="siteContent"></div>
+            </div>
+
+            <!-- ===== РАЗДЕЛ ГБУ ЖИЛИЩНИК ===== -->
+            <div class="section" id="section-gbuz">
+                <h2 class="section-title">🏛️ ГБУ Жилищник</h2>
+                <div id="gbuzContent">
+                    <div style="text-align:center;padding:40px 20px;color:#888;">
+                        <span style="font-size:48px;display:block;margin-bottom:16px;">🏛️</span>
+                        <p style="font-size:18px;font-weight:600;color:var(--blue);">Панель ГБУ Жилищник</p>
+                        <p style="font-size:14px;">Общая сводка по району, отчеты и аналитика</p>
+                        <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                            <div style="background:white;padding:16px;border-radius:12px;box-shadow:var(--shadow);">
+                                <div style="font-size:28px;font-weight:900;color:var(--blue);">47</div>
+                                <div style="font-size:13px;color:#888;">Заявок выполнено</div>
+                            </div>
+                            <div style="background:white;padding:16px;border-radius:12px;box-shadow:var(--shadow);">
+                                <div style="font-size:28px;font-weight:900;color:var(--green);">92%</div>
+                                <div style="font-size:13px;color:#888;">Эффективность</div>
+                            </div>
+                            <div style="background:white;padding:16px;border-radius:12px;box-shadow:var(--shadow);">
+                                <div style="font-size:28px;font-weight:900;color:var(--orange);">12</div>
+                                <div style="font-size:13px;color:#888;">Активных заявок</div>
+                            </div>
+                            <div style="background:white;padding:16px;border-radius:12px;box-shadow:var(--shadow);">
+                                <div style="font-size:28px;font-weight:900;color:var(--gold);">8</div>
+                                <div style="font-size:13px;color:#888;">Поставок</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== РАЗДЕЛ СКЛАД ===== -->
+            <div class="section" id="section-stock">
+                <h2 class="section-title">🏚️ Склад</h2>
+                <div id="stockContent"></div>
+            </div>
+        </div>
+
+        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+        <nav class="bottom-nav" id="bottomNav">
+            <!-- Заполняется динамически -->
+        </nav>
+    </div>
+
+    <!-- ============================================
+    ОКНО ЧАТА
+    ============================================ -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-window-header">
+            <button class="back-btn" onclick="closeChat()">←</button>
+            <span class="chat-title" id="chatTitle">Чат</span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Сообщения -->
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Введите сообщение..." onkeydown="if(event.key==='Enter') sendMessage()">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  ДАННЫЕ ПРИЛОЖЕНИЯ
+        // ============================================================
+
+        // Данные пользователя
+        let currentUser = {
+            name: '',
+            phone: '',
+            role: '',
+            isLoggedIn: false
+        };
+
+        // Роли с их настройками
+        const ROLES = {
+            director: { label: 'Директор', icon: '👔' },
+            dispatcher: { label: 'Диспетчер', icon: '📡' },
+            warehouse: { label: 'Начальник склада', icon: '📦' },
+            site: { label: 'Начальник участка', icon: '🔧' },
+            gbuz: { label: 'ГБУ Жилищник', icon: '🏛️' },
+            stock: { label: 'Склад', icon: '🏚️' }
+        };
+
+        // Навигация для каждой роли
+        const ROLE_NAV = {
+            director: [
+                { id: 'chats', icon: '💬', label: 'Чаты' }
+            ],
+            dispatcher: [
+                { id: 'requests', icon: '📋', label: 'Заявки' },
+                { id: 'chats', icon: '💬', label: 'Чаты' },
+                { id: 'line', icon: '📊', label: 'Линия' }
+            ],
+            warehouse: [
+                { id: 'stock', icon: '📦', label: 'Расход/Приход' },
+                { id: 'requests', icon: '📋', label: 'Заявки' },
+                { id: 'supplies', icon: '🚛', label: 'Статусы поставок' },
+                { id: 'chats', icon: '💬', label: 'Чаты' }
+            ],
+            site: [
+                { id: 'requests', icon: '📋', label: 'Заявки' },
+                { id: 'chats', icon: '💬', label: 'Чат' }
+            ],
+            gbuz: [
+                { id: 'dashboard', icon: '📊', label: 'Сводка' }
+            ],
+            stock: [
+                { id: 'chats', icon: '💬', label: 'Чаты' },
+                { id: 'requests', icon: '📋', label: 'Заявки' }
+            ]
+        };
+
+        // ============================================================
+        //  БАЗА ДАННЫХ (локальная)
+        // ============================================================
+
+        let DB = {
+            users: [],
+            requests: [],
+            materials: [],
+            supplies: [],
+            chats: {},
+            messages: {}
+        };
+
+        // Инициализация тестовых данных
+        function initDB() {
+            // Материалы
+            DB.materials = [
+                { id: 'm1', name: 'Цемент М500', quantity: 150, unit: 'мешков', reserved: 20 },
+                { id: 'm2', name: 'Песок строительный', quantity: 45, unit: 'м³', reserved: 5 },
+                { id: 'm3', name: 'Арматура 12 мм', quantity: 320, unit: 'м', reserved: 80 },
+                { id: 'm4', name: 'Кирпич красный', quantity: 2800, unit: 'шт', reserved: 400 },
+                { id: 'm5', name: 'Краска фасадная', quantity: 85, unit: 'л', reserved: 10 },
+                { id: 'm6', name: 'Смесь штукатурная', quantity: 120, unit: 'мешков', reserved: 30 },
+                { id: 'm7', name: 'Труба ПНД 32 мм', quantity: 200, unit: 'м', reserved: 50 },
+                { id: 'm8', name: 'Электроды 3 мм', quantity: 65, unit: 'кг', reserved: 15 },
+            ];
+
+            // Тестовые заявки
+            DB.requests = [{
+                id: 'req-001',
+                material: 'Цемент М500',
+                quantity: '50 мешков',
+                status: 'processing',
+                createdAt: '2026-07-29 10:30',
+                site: 'Участок №3',
+                author: 'Иванов И.И.',
+                assignedTo: 'warehouse',
+                timeline: [
+                    { date: '2026-07-29 10:30', status: 'pending', note: 'Заявка создана' },
+                    { date: '2026-07-29 10:45', status: 'processing', note: 'Принято в обработку' },
+                    { date: '2026-07-29 11:20', status: 'signed', note: 'Подписано' },
+                    { date: '2026-07-29 12:00', status: 'assembling', note: 'Передано на склад' },
+                ]
+            }, {
+                id: 'req-002',
+                material: 'Арматура 12 мм',
+                quantity: '120 м',
+                status: 'shipped',
+                createdAt: '2026-07-28 14:20',
+                site: 'Участок №1',
+                author: 'Петров П.П.',
+                assignedTo: 'warehouse',
+                timeline: [
+                    { date: '2026-07-28 14:20', status: 'pending', note: 'Заявка создана' },
+                    { date: '2026-07-28 14:45', status: 'processing', note: 'Принято в обработку' },
+                    { date: '2026-07-28 15:20', status: 'signed', note: 'Подписано' },
+                    { date: '2026-07-28 15:50', status: 'assembling', note: 'Передано на склад' },
+                    { date: '2026-07-28 16:40', status: 'shipped', note: 'Сборка, отгрузка' },
+                ]
+            }, {
+                id: 'req-003',
+                material: 'Кирпич красный',
+                quantity: '500 шт',
+                status: 'done',
+                createdAt: '2026-07-28 09:00',
+                site: 'Участок №2',
+                author: 'Сидоров С.С.',
+                assignedTo: 'warehouse',
+                timeline: [
+                    { date: '2026-07-28 09:00', status: 'pending', note: 'Заявка создана' },
+                    { date: '2026-07-28 09:30', status: 'processing', note: 'Принято в обработку' },
+                    { date: '2026-07-28 10:00', status: 'signed', note: 'Подписано' },
+                    { date: '2026-07-28 10:40', status: 'assembling', note: 'Передано на склад' },
+                    { date: '2026-07-28 11:30', status: 'shipped', note: 'Сборка, отгрузка' },
+                    { date: '2026-07-28 13:00', status: 'done', note: 'Заявка выполнена!' },
+                ]
+            }, {
+                id: 'req-004',
+                material: 'Краска фасадная',
+                quantity: '30 л',
+                status: 'pending',
+                createdAt: '2026-07-29 09:15',
+                site: 'Участок №1',
+                author: 'Петров П.П.',
+                assignedTo: 'warehouse',
+                timeline: [
+                    { date: '2026-07-29 09:15', status: 'pending', note: 'Заявка создана' }
+                ]
+            }];
+
+            // Тестовые поставки
+            DB.supplies = [
+                { id: 's1', name: 'Цемент М500', quantity: '200 мешков', status: 'В пути', date: '2026-08-01' },
+                { id: 's2', name: 'Арматура 12 мм', quantity: '500 м', status: 'Ожидается', date: '2026-08-03' },
+                { id: 's3', name: 'Кирпич красный', quantity: '3000 шт', status: 'Доставлен', date: '2026-07-29' },
+            ];
+
+            // Тестовые сообщения чатов
+            const chatKeys = [
+                'director_dispatcher', 'dispatcher_warehouse', 'warehouse_director',
+                'site_dispatcher', 'stock_dispatcher', 'stock_warehouse'
+            ];
+            chatKeys.forEach(key => {
+                DB.messages[key] = [
+                    { from: 'system', text: 'Чат создан', time: '2026-07-29 10:00' }
+                ];
+            });
+
+            // Дополнительные тестовые сообщения
+            DB.messages['director_dispatcher'] = [
+                { from: 'system', text: 'Чат создан', time: '2026-07-29 10:00' },
+                { from: 'dispatcher', text: 'Доброе утро, Иван Иванович! Все заявки в работе.', time: '2026-07-29 10:15' },
+                { from: 'director', text: 'Отлично! Как продвигается заявка №001?', time: '2026-07-29 10:20' },
+                { from: 'dispatcher', text: 'Уже на сборке, к вечеру отгружаем.', time: '2026-07-29 10:22' },
+                { from: 'director', text: 'Хорошо. Держите в курсе.', time: '2026-07-29 10:25' },
+            ];
+            DB.messages['dispatcher_warehouse'] = [
+                { from: 'system', text: 'Чат создан', time: '2026-07-29 10:00' },
+                { from: 'dispatcher', text: 'Здравствуйте! Заявка №004 пришла, проверьте наличие.', time: '2026-07-29 10:30' },
+                { from: 'warehouse', text: 'Принял. Цемент есть, поставляем.', time: '2026-07-29 10:35' },
+            ];
+            DB.messages['site_dispatcher'] = [
+                { from: 'system', text: 'Чат создан', time: '2026-07-29 10:00' },
+                { from: 'site', text: 'Доброе утро! Нужна арматура на участок №1.', time: '2026-07-29 09:10' },
+                { from: 'dispatcher', text: 'Принято. Оформляйте заявку, после обеда привезут.', time: '2026-07-29 09:15' },
+            ];
+        }
+
+        // ============================================================
+        //  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ============================================================
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+        }
+
+        function formatDate(d) {
+            const date = new Date(d);
+            return date.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getStatusLabel(status) {
+            const map = {
+                'pending': '⏳ Ожидает',
+                'processing': '🔄 В обработке',
+                'signed': '✅ Подписано',
+                'assembling': '📦 Сборка',
+                'shipped': '🚛 Отгрузка',
+                'done': '✔️ Выполнено',
+                'cancelled': '❌ Отменено'
+            };
+            return map[status] || status;
+        }
+
+        function getStatusClass(status) {
+            const map = {
+                'pending': 'pending',
+                'processing': 'processing',
+                'signed': 'signed',
+                'assembling': 'assembling',
+                'shipped': 'shipped',
+                'done': 'done',
+                'cancelled': 'cancelled'
+            };
+            return map[status] || 'pending';
+        }
+
+        // ============================================================
+        //  АВТОРИЗАЦИЯ
+        // ============================================================
+
+        function showAuthError(id, show) {
+            document.getElementById(id).style.display = show ? 'block' : 'none';
+        }
+
+        // Переключение табов
+        document.querySelectorAll('.auth-tabs button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const tab = this.dataset.tab;
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                document.getElementById(tab === 'login' ? 'loginForm' : 'registerForm').classList.add('active');
+                showAuthError('loginError', false);
+                showAuthError('regError', false);
+            });
+        });
+
+        let lastCode = '';
+
+        function sendCode() {
+            const phone = document.getElementById('regPhone').value.trim();
+            if (!phone) {
+                showAuthError('regError', true);
+                document.getElementById('regError').textContent = 'Введите телефон или email.';
+                return;
+            }
+            // Генерируем код
+            lastCode = Math.floor(100000 + Math.random() * 900000).toString();
+            alert(`Код подтверждения: ${lastCode}\n(в демо-режиме код показан здесь)`);
+            document.getElementById('regCode').placeholder = 'Код отправлен: ' + lastCode;
+            showAuthError('regError', false);
+        }
+
+        function handleRegister() {
+            const phone = document.getElementById('regPhone').value.trim();
+            const code = document.getElementById('regCode').value.trim();
+
+            if (!phone || !code) {
+                showAuthError('regError', true);
+                document.getElementById('regError').textContent = 'Заполните все поля и получите код.';
+                return;
+            }
+
+            if (code !== lastCode) {
+                showAuthError('regError', true);
+                document.getElementById('regError').textContent = 'Неверный код подтверждения.';
+                return;
+            }
+
+            // Проверяем, есть ли пользователь
+            let user = DB.users.find(u => u.phone === phone);
+            if (!user) {
+                user = { id: generateId(), name: 'Пользователь', phone: phone, role: '' };
+                DB.users.push(user);
+            }
+
+            currentUser = { ...user, isLoggedIn: true };
+            showAuthScreen(false);
+            showRoleSelection();
+        }
+
+        function handleLogin() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            if (!phone) {
+                showAuthError('loginError', true);
+                document.getElementById('loginError').textContent = 'Введите телефон или email.';
+                return;
+            }
+
+            let user = DB.users.find(u => u.phone === phone);
+            if (!user) {
+                // Если не найден, создаем нового
+                user = { id: generateId(), name: 'Пользователь', phone: phone, role: '' };
+                DB.users.push(user);
+            }
+
+            currentUser = { ...user, isLoggedIn: true };
+            showAuthScreen(false);
+
+            if (user.role) {
+                // У пользователя уже есть роль
+                enterApp(user.role);
+            } else {
+                showRoleSelection();
+            }
+        }
+
+        function showAuthScreen(show) {
+            document.getElementById('authScreen').style.display = show ? 'flex' : 'none';
+            document.getElementById('app').style.display = show ? 'none' : 'block';
+            if (!show) {
+                document.getElementById('app').style.display = 'block';
+            }
+        }
+
+        function showRoleSelection() {
+            document.getElementById('roleSelection').style.display = 'block';
+            document.getElementById('appContent').style.display = 'none';
+            document.getElementById('bottomNav').style.display = 'none';
+            document.getElementById('userName').textContent = currentUser.name || 'Пользователь';
+            document.getElementById('userRole').textContent = 'Выберите роль';
+            document.getElementById('userAvatar').textContent = '👤';
+        }
+
+        function handleLogout() {
+            currentUser.isLoggedIn = false;
+            currentUser.role = '';
+            document.getElementById('roleSelection').style.display = 'none';
+            document.getElementById('appContent').style.display = 'none';
+            document.getElementById('bottomNav').style.display = 'none';
+            showAuthScreen(true);
+            document.getElementById('authScreen').style.display = 'flex';
+            document.getElementById('loginPhone').value = '';
+            document.getElementById('regPhone').value = '';
+            document.getElementById('regCode').value = '';
+            lastCode = '';
+        }
+
+        // ============================================================
+        //  ВЫБОР РОЛИ
+        // ============================================================
+
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const role = this.dataset.role;
+                document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                enterApp(role);
+            });
+        });
+
+        function enterApp(role) {
+            currentUser.role = role;
+            // Сохраняем роль в базе
+            const user = DB.users.find(u => u.id === currentUser.id);
+            if (user) user.role = role;
+
+            document.getElementById('roleSelection').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+            document.getElementById('bottomNav').style.display = 'flex';
+
+            document.getElementById('userName').textContent = currentUser.name || 'Пользователь';
+            document.getElementById('userRole').textContent = ROLES[role]?.label || role;
+            document.getElementById('userAvatar').textContent = ROLES[role]?.icon || '👤';
+
+            // Показываем нужную секцию
+            document.querySelectorAll('.app-content .section').forEach(s => s.classList.remove('active'));
+
+            const sectionMap = {
+                director: 'section-director',
+                dispatcher: 'section-dispatcher',
+                warehouse: 'section-warehouse',
+                site: 'section-site',
+                gbuz: 'section-gbuz',
+                stock: 'section-stock'
+            };
+
+            const sectionId = sectionMap[role];
+            if (sectionId) {
+                document.getElementById(sectionId).classList.add('active');
+            }
+
+            // Строим навигацию
+            buildNav(role);
+
+            // Загружаем контент для роли
+            loadRoleContent(role);
+        }
+
+        // ============================================================
+        //  ПОСТРОЕНИЕ НАВИГАЦИИ
+        // ============================================================
+
+        function buildNav(role) {
+            const nav = document.getElementById('bottomNav');
+            const items = ROLE_NAV[role] || [];
+
+            nav.innerHTML = items.map(item => `
+                <button class="nav-item active" data-tab="${item.id}" onclick="switchTab('${item.id}')">
+                    <span class="nav-icon">${item.icon}</span>
+                    ${item.label}
+                </button>
+            `).join('');
+
+            // Активируем первый
+            if (items.length > 0) {
+                nav.querySelectorAll('.nav-item').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === 0);
+                });
+                // Загружаем первый таб
+                loadTab(items[0].id, role);
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('#bottomNav .nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+            loadTab(tabId, currentUser.role);
+        }
+
+        // ============================================================
+        //  ЗАГРУЗКА КОНТЕНТА ТАБОВ
+        // ============================================================
+
+        function loadTab(tabId, role) {
+            const container = getContentContainer(role);
+            if (!container) return;
+
+            switch (role) {
+                case 'director':
+                    if (tabId === 'chats') renderDirectorChats(container);
+                    break;
+                case 'dispatcher':
+                    if (tabId === 'requests') renderDispatcherRequests(container);
+                    else if (tabId === 'chats') renderDispatcherChats(container);
+                    else if (tabId === 'line') renderDispatcherLine(container);
+                    break;
+                case 'warehouse':
+                    if (tabId === 'stock') renderWarehouseStock(container);
+                    else if (tabId === 'requests') renderWarehouseRequests(container);
+                    else if (tabId === 'supplies') renderWarehouseSupplies(container);
+                    else if (tabId === 'chats') renderWarehouseChats(container);
+                    break;
+                case 'site':
+                    if (tabId === 'requests') renderSiteRequests(container);
+                    else if (tabId === 'chats') renderSiteChats(container);
+                    break;
+                case 'stock':
+                    if (tabId === 'chats') renderStockChats(container);
+                    else if (tabId === 'requests') renderStockRequests(container);
+                    break;
+                default:
+                    container.innerHTML = '<p style="color:#888;">Раздел в разработке</p>';
+            }
+        }
+
+        function getContentContainer(role) {
+            const map = {
+                director: document.getElementById('directorContent'),
+                dispatcher: document.getElementById('dispatcherContent'),
+                warehouse: document.getElementById('warehouseContent'),
+                site: document.getElementById('siteContent'),
+                stock: document.getElementById('stockContent')
+            };
+            return map[role];
+        }
+
+        function loadRoleContent(role) {
+            const navItems = ROLE_NAV[role] || [];
+            if (navItems.length > 0) {
+                loadTab(navItems[0].id, role);
+            }
+        }
+
+        // ============================================================
+        //  КОНТЕНТ: ДИРЕКТОР
+        // ============================================================
+
+        function renderDirectorChats(container) {
+            container.innerHTML = `
+                <div class="chat-list">
+                    <div class="chat-item" onclick="openChat('director_dispatcher', 'Диспетчер')">
+                        <div class="chat-info">
+                            <div class="chat-avatar">📡</div>
+                            <div>
+                                <div class="chat-name">Диспетчер</div>
+                                <div class="chat-last">${getChatLast('director_dispatcher')}</div>
+                            </div>
+                        </div>
+                        <span class="chat-badge">${getChatUnread('director_dispatcher')}</span>
+                    </div>
+                    <div class="chat-item" onclick="openChat('director_warehouse', 'Начальник склада')">
+                        <div class="chat-info">
+                            <div class="chat-avatar">📦</div>
+                            <div>
+                                <div class="chat-name">Начальник склада</div>
+                                <div class="chat-last">${getChatLast('director_warehouse')}</div>
+                            </div>
+                        </div>
+                        <span class="chat-badge">${getChatUnread('director_warehouse')}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        //  КОНТЕНТ: ДИСПЕТЧЕР
+        // ============================================================
+
+        function renderDispatcherRequests(container) {
+            let html = `
+                <div class="request-form">
+                    <h3 style="margin-bottom:16px;color:var(--blue);">📝 Создать заявку</h3>
+                    <div class="form-row">
+                        <div>
+                            <label>Материал</label>
+                            <input type="text" id="dispReqMat" placeholder="Например: Цемент М500">
+                        </div>
+                        <div>
+                            <label>Количество</label>
+                            <input type="text" id="dispReqQty" placeholder="50 мешков">
+                        </div>
+                    </div>
+                    <label>Участок</label>
+                    <input type="text" id="dispReqSite" placeholder="Участок №1">
+                    <label>Описание</label>
+                    <textarea id="dispReqDesc" placeholder="Дополнительная информация..."></textarea>
+                    <button class="submit-btn" onclick="createDispatcherRequest()">📤 Отправить заявку</button>
+                </div>
+                <h3 style="margin-bottom:16px;color:var(--blue);">📋 Активные заявки</h3>
+            `;
+
+            const requests = DB.requests.filter(r => r.status !== 'done' && r.status !== 'cancelled');
+            if (requests.length === 0) {
+                html += `<p style="color:#888;">Нет активных заявок</p>`;
+            } else {
+                requests.forEach(r => {
+                    html += renderRequestCard(r);
+                });
+            }
+
+            html += `
+                <h3 style="margin:24px 0 16px;color:var(--blue);">✅ Выполненные заявки</h3>
+            `;
+            const done = DB.requests.filter(r => r.status === 'done' || r.status === 'cancelled');
+            if (done.length === 0) {
+                html += `<p style="color:#888;">Нет выполненных заявок</p>`;
+            } else {
+                done.forEach(r => {
+                    html += renderRequestCard(r);
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        function createDispatcherRequest() {
+            const material = document.getElementById('dispReqMat').value.trim();
+            const quantity = document.getElementById('dispReqQty').value.trim();
+            const site = document.getElementById('dispReqSite').value.trim();
+            const desc = document.getElementById('dispReqDesc').value.trim();
+
+            if (!material || !quantity || !site) {
+                alert('Заполните все обязательные поля!');
+                return;
+            }
+
+            const req = {
+                id: 'req-' + String(DB.requests.length + 1).padStart(3, '0'),
+                material: material,
+                quantity: quantity,
+                status: 'pending',
+                createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+                site: site,
+                author: currentUser.name || 'Диспетчер',
+                assignedTo: 'warehouse',
+                timeline: [
+                    { date: new Date().toISOString().slice(0, 16).replace('T', ' '), status: 'pending',
+                        note: 'Заявка создана' }
+                ]
+            };
+
+            DB.requests.push(req);
+            alert('✅ Заявка ' + req.id + ' создана!');
+            document.getElementById('dispReqMat').value = '';
+            document.getElementById('dispReqQty').value = '';
+            document.getElementById('dispReqSite').value = '';
+            document.getElementById('dispReqDesc').value = '';
+            loadTab('requests', 'dispatcher');
+        }
+
+        function renderRequestCard(req) {
+            const statusLabel = getStatusLabel(req.status);
+            const statusClass = getStatusClass(req.status);
+
+            let html = `
+                <div class="request-card">
+                    <div class="request-header">
+                        <span class="request-id">#${req.id}</span>
+                        <span class="request-status ${statusClass}">${statusLabel}</span>
+                    </div>
+                    <div class="request-material">${req.material}</div>
+                    <div class="request-details">${req.quantity} | ${req.site} | ${req.createdAt}</div>
+            `;
+
+            // Таймлайн
+            if (req.timeline && req.timeline.length > 0) {
+                html += `<div style="margin-top:8px;font-size:12px;color:#888;">`;
+                req.timeline.forEach(t => {
+                    const s = getStatusLabel(t.status);
+                    html += `<div>• ${t.date} — ${s}${t.note ? ': ' + t.note : ''}</div>`;
+                });
+                html += `</div>`;
+            }
+
+            // Действия
+            html += `
+                    <div class="request-actions">
+            `;
+
+            const statusFlow = ['pending', 'processing', 'signed', 'assembling', 'shipped', 'done'];
+            const currentIdx = statusFlow.indexOf(req.status);
+            const nextStatus = statusFlow[currentIdx + 1];
+
+            if (nextStatus && (currentUser.role === 'dispatcher' || currentUser.role === 'warehouse')) {
+                html += `<button class="btn-primary" onclick="updateRequestStatus('${req.id}', '${nextStatus}')">
+                    ➜ ${getStatusLabel(nextStatus)}
+                </button>`;
+            }
+
+            if (currentUser.role === 'dispatcher' && req.status !== 'done' && req.status !== 'cancelled') {
+                html += `<button class="btn-danger" onclick="updateRequestStatus('${req.id}', 'cancelled')">❌ Отменить</button>`;
+            }
+
+            if (req.status === 'done') {
+                html += `<span style="color:var(--green);font-weight:700;">✔️ Заявка выполнена!</span>`;
+            }
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            return html;
+        }
+
+        function updateRequestStatus(reqId, newStatus) {
+            const req = DB.requests.find(r => r.id === reqId);
+            if (!req) return;
+
+            req.status = newStatus;
+            if (!req.timeline) req.timeline = [];
+            req.timeline.push({
+                date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+                status: newStatus,
+                note: getStatusLabel(newStatus)
+            });
+
+            // Если выполнено, обновляем склад
+            if (newStatus === 'done') {
+                const mat = DB.materials.find(m => m.name === req.material.split(' ')[0]);
+                if (mat) {
+                    const qty = parseInt(req.quantity) || 0;
+                    mat.quantity = Math.max(0, mat.quantity - qty);
+                }
+            }
+
+            loadTab('requests', currentUser.role);
+            // Обновляем все вкладки с заявками
+            ['dispatcher', 'warehouse', 'site', 'stock'].forEach(r => {
+                if (currentUser.role === r) loadTab('requests', r);
+            });
+        }
+
+        function renderDispatcherChats(container) {
+            container.innerHTML = `
+                <div class="chat-list">
+                    <div class="chat-item" onclick="openChat('dispatcher_director', 'Директор')">
+                        <div class="chat-info">
+                            <div class="chat-avatar">👔</div>
+                            <div>
+                                <div class="chat-name">Директор</div>
+                                <div class="chat-last">${getChatLast('dispatcher_director')}</div>
+                            </div>
+                        </div>
+                        <span class="chat-badge">${getChatUnread('dispatcher_director')}</span>
+                    </div>
+                    <div class="chat-item" onclick="openChat('dispatcher_warehouse', 'Начальник склада')">
+                        <div class="chat-info">
+                            <div class="chat-avatar">📦</div>
+                            <div>
+                                <div class="chat-name">Начальник склада</div>
+                                <div class="chat-last">${getChatLast('dispatcher_warehouse')}</div>
+                            </div>
+                        </div>
+                        <span class="chat-badge">${getChatUnread('dispatcher_warehouse')}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDispatcherLine(container) {
+            let html = `
+                <h3 style="margin-bottom:16px;color:var(--blue);">📊 Линия заявок</h3>
+                <p style="color:#888;margin-bottom:16px;">Все заявки в очереди на обработку</p>
+            `;
+
+            const pending = DB.requests.filter(r => r.status !== 'done' && r.status !== 'cancelled');
+            if (pending.length === 0) {
+                html += `<p style="color:#888;">Нет активных заявок в линии</p>`;
+            } else {
+                pending.forEach(r => {
+                    html += `
+                        <div class="line-item">
+                            <div class="line-header">
+                                <span class="line-material">#${r.id} — ${r.material}</span>
+                                <span class="request-status ${getStatusClass(r.status)}">${getStatusLabel(r.status)}</span>
+                            </div>
+                            <div style="font-size:13px;color:#888;">${r.quantity} | ${r.site}</div>
+                            <div class="line-actions">
+                                <button class="btn-primary" onclick="openChat('dispatcher_warehouse', 'Начальник склада')">💬 На склад</button>
+                                <button class="btn-outline" onclick="openChat('dispatcher_director', 'Директор')">💬 Директору</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        //  КОНТЕНТ: НАЧАЛЬНИК СКЛАДА
+        // ============================================================
+
+        function renderWarehouseStock(container) {
+            let html = `
+                <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+                    <button class="btn-primary" onclick="showAddMaterial()">➕ Добавить материал</button>
+                    <button class="btn-outline" onclick="loadTab('stock','warehouse')">🔄 Обновить</button>
+                </div>
+                <div id="materialList">
+            `;
+
+            DB.materials.forEach(mat => {
+                const available = mat.quantity - (mat.reserved || 0);
+                html += `
+                    <div class="material-item">
+                        <div class="mat-info">
+                            <span class="mat-name">${mat.name}</span>
+                            <span class="mat-quantity">В наличии: ${mat.quantity} ${mat.unit} | Зарезервировано: ${mat.reserved || 0} ${mat.unit}</span>
+                            <span style="font-size:12px;color:${available > 0 ? 'var(--green)' : 'var(--red)'};">
+                                Доступно: ${available} ${mat.unit}
+                            </span>
+                        </div>
+                        <div class="mat-actions">
+                            <button class="btn-success" onclick="reserveMaterial('${mat.id}')">📌 Зарезервировать</button>
+                            <button class="btn-warning" onclick="editMaterial('${mat.id}')">✏️ Изменить</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function showAddMaterial() {
+            const name = prompt('Введите название материала:');
+            if (!name) return;
+            const quantity = prompt('Введите количество:');
+            if (!quantity) return;
+            const unit = prompt('Введите единицу измерения (шт, м, кг, л, мешков):') || 'шт';
+
+            DB.materials.push({
+                id: 'm' + (DB.materials.length + 1),
+                name: name,
+                quantity: parseInt(quantity) || 0,
+                unit: unit,
+                reserved: 0
+            });
+
+            loadTab('stock', 'warehouse');
+        }
+
+        function reserveMaterial(id) {
+            const mat = DB.materials.find(m => m.id === id);
+            if (!mat) return;
+            const qty = prompt(`Сколько ${mat.unit} ${mat.name} зарезервировать? (доступно: ${mat.quantity - (mat.reserved || 0)})`);
+            if (!qty) return;
+            const num = parseInt(qty);
+            if (num > mat.quantity - (mat.reserved || 0)) {
+                alert('Недостаточно материала!');
+                return;
+            }
+            mat.reserved = (mat.reserved || 0) + num;
+            loadTab('stock', 'warehouse');
+        }
+
+        function editMaterial(id) {
+            const mat = DB.materials.find(m => m.id === id);
+            if (!mat) return;
+            const action = prompt(`Что сделать с ${mat.name}?\n1 - Добавить\n2 - Уменьшить\n3 - Изменить название`, '1');
+            if (!action) return;
+
+            if (action === '1') {
+                const qty = prompt('Сколько добавить?');
+                if (qty) mat.quantity += parseInt(qty);
+            } else if (action === '2') {
+                const qty = prompt('Сколько убрать?');
+                if (qty) mat.quantity = Math.max(0, mat.quantity - parseInt(qty));
+            } else if (action === '3') {
+                const name = prompt('Новое название:');
+                if (name) mat.name = name;
+            }
+            loadTab('stock', 'warehouse');
+        }
+
+        function renderWarehouseRequests(container) {
+            let html = `<h3 style="margin-bottom:16px;color:var(--blue);">📋 Все заявки</h3>`;
+
+            if (DB.requests.length === 0) {
+                html += `<p style="color:#888;">Нет заявок</p>`;
+            } else {
+                DB.requests.forEach(r => {
+                    html += renderRequestCard(r);
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        function renderWarehouseSupplies(container) {
+            let html = `
+                <h3 style="margin-bottom:16px;color:var(--blue);">🚛 Статусы поставок</h3>
+                <button class="btn-primary" style="margin-bottom:16px;" onclick="addSupply()">➕ Добавить поставку</button>
+            `;
+
+            if (DB.supplies.length === 0) {
+                html += `<p style="color:#888;">Нет поставок</p>`;
+            } else {
+                DB.supplies.forEach(s => {
+                    html += `
+                        <div class="supply-item">
+                            <div class="supply-header">
+                                <span class="supply-name">${s.name}</span>
+                                <span class="supply-status">${s.status}</span>
+                            </div>
+                            <div class="supply-details">${s.quantity} | ${s.date}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        function addSupply() {
+            const name = prompt('Название материала:');
+            if (!name) return;
+            const quantity = prompt('Количество:');
+            if (!quantity) return;
+            const status = prompt('Статус (В пути/Ожидается/Доставлен):', 'В пути');
+            if (!status) return;
+
+            DB.supplies.push({
+                id: 's' + (DB.supplies.length + 1),
+                name: name,
+                quantity: quantity,
+                status: status,
+                date: new Date().toISOString().slice(0, 10)
+            });
+
+            loadTab('supplies', 'warehouse');
+        }
+
+        function renderWarehouseChats(container) {
+            container.innerHTML = `
+                <div class="chat-list">
+                    <div class="chat-item" onclick="openChat('warehouse_dispatcher', 'Диспетчер')">
+                        <div class="chat-info">
+                            <div class="chat-avatar">📡</div>
+                            <div>
+                                <div class="chat-name">Диспетчер</div>
+                                <div class="chat-last">${getChatLast('warehouse_dispatcher')}</div>
+                            </div>
+                        </div>
+                        <span class="chat-badge">${getChatUnread('warehouse_dispatcher')}</span>
+                    </div>
+                    <div class="chat-item" onclick="openChat('warehouse_director', 'Директор')">
+                        <div class="chat-info">
+                            <div class="chat-avatar">👔</div>
+                            <div>
+                                <div class="chat-name">Директор</div>
+                                <div class="chat-last">${getChatLast('warehouse_director')}</div>
+                            </div>
+                        </div>
+                        <span class="chat-badge">${getChatUnread('warehouse_director')}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        //  КОНТЕНТ: НАЧАЛЬНИК УЧАСТКА
+        // ============================================================
+
+        function renderSiteRequests(container) {
+            let html = `
+                <div class="request-form">
+                    <h3 style="margin-bottom:16px;color:var(--blue);">📝 Создать заявку</h3>
+                    <div class="form-row">
+                        <div>
+                            <label>Материал</label>
+                            <input type="text" id="siteReqMat" placeholder="Например: Цемент М500">
+                        </div>
+                        <div>
+                            <label>Количество</label>
+                            <input type="text" id="siteReqQty" placeholder="50 мешков">
+                        </div>
+                    </div>
+                    <label>Описание</label>
+                    <textarea id="siteReqDesc" placeholder="Дополнительная информация..."></textarea>
+                    <button class="submit-btn" onclick="createSiteRequest()">📤 Отправить заявку</button>
+                </div>
+                <h3 style="margin-bottom:16px;color:var(--blue);">📋 Мои заявки</h3>
+            `;
+
+            const myRequests = DB.requests.filter(r => r.author === (currentUser.name || 'Начальник участка'));
+            if (myRequests.length === 0) {
+                html += `<p style="color:#888;">У вас нет заявок</p>`;
+            } else {
+                myRequests.forEach(r => {
+                    html += renderRequestCard(r);
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        function createSiteRequest() {
+            const material = document.getElementById('siteReqMat').value.trim();
+            const quantity = document.getElementById('siteReqQty').value.trim();
+            const desc = document.getElementById('siteReqDesc').value.trim();
+
+            if (!material || !quantity) {
+                alert('Заполните все обязательные поля!');
+                return;
+            }
+
+            const req = {
+                id: 'req-' + String(DB.requests.length + 1).padStart(3, '0'),
+                material: material,
+                quantity: quantity,
+                status: 'pending',
+                createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+                site: 'Участок ' + (Math.floor(Math.random() * 3) + 1),
+                author: currentUser.name || 'Начальник участка',
+                assignedTo: 'dispatcher',
+                timeline: [
+                    { date: new Date().toISOString().slice(0, 16).replace('T', ' '), status: 'pending',
+                        note: 'Заявка создана' }
+                ]
+            };
+
+            DB.requests.push(req);
+            alert('✅ Заявка ' + req.id + ' создана! Отправлена диспетчеру.');
+            document.getElementById('siteReqMat').value = '';
+            document.getElementById('siteReqQty').value = '';
+            document.getElementById('siteReqDesc').value = '';
+            loadTab('requests', 'site');
+        }
+
+        function renderSiteChats(container) {
+            container.innerHTML = `
+                <div class="chat-list">
+                    <div class="chat-item" onclick="openChat('site_dispatcher', 'Диспетчер')">
+                        <div class="chat-info">
+                            <div class="chat-avatar">📡</div>
+                            <div>
+                                <div class="chat-name">Диспетчер</div>
+                                <div class="chat-last">${getChatLast('site_dispatcher')}</div>
+                            </div>
+                        </div>
+                        <span class="chat-badge">${getChatUnread('site_dispatcher')}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        //  КОНТЕНТ: СКЛАД
+        // ============================================================
+
+        function renderStockChats(container) {
+            container.innerHTML = `
+                <div class="chat-list">
+                    <div class="chat-item" onclick="openChat('stock_dispatcher', 'Диспетчер')">
+                        <div class="chat-info">
+                            <div class="chat-avatar">📡</div>
+                            <div>
+                                <div class="chat-name">Диспетчер</div>
+                                <div class="chat-last">${getChatLast('stock_dispatcher')}</div>
+                            </div>
+                        </div>
+                        <span class="chat-badge">${getChatUnread('stock_dispatcher')}</span>
+                    </div>
+                    <div class="chat-item" onclick="openChat('stock_warehouse', 'Начальник склада')">
+                        <div class="chat-info">
+                            <div class="chat-avatar">📦</div>
+                            <div>
+                                <div class="chat-name">Начальник склада</div>
+                                <div class="chat-last">${getChatLast('stock_warehouse')}</div>
+                            </div>
+                        </div>
+                        <span class="chat-badge">${getChatUnread('stock_warehouse')}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStockRequests(container) {
+            let html = `<h3 style="margin-bottom:16px;color:var(--blue);">📋 Заявки на складе</h3>`;
+
+            const stockRequests = DB.requests.filter(r => r.status !== 'done' && r.status !== 'cancelled');
+            if (stockRequests.length === 0) {
+                html += `<p style="color:#888;">Нет заявок на складе</p>`;
+            } else {
+                stockRequests.forEach(r => {
+                    html += renderRequestCard(r);
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        //  ЧАТЫ
+        // ============================================================
+
+        let currentChatId = '';
+
+        function openChat(chatId, title) {
+            currentChatId = chatId;
+            if (!DB.messages[chatId]) {
+                DB.messages[chatId] = [
+                    { from: 'system', text: 'Чат создан', time: new Date().toISOString().slice(0, 16).replace('T', ' ') }
+                ];
+            }
+
+            document.getElementById('chatTitle').textContent = title || 'Чат';
+            document.getElementById('chatWindow').classList.add('open');
+            renderChatMessages(chatId);
+            document.getElementById('chatInput').focus();
+        }
+
+        function closeChat() {
+            document.getElementById('chatWindow').classList.remove('open');
+            currentChatId = '';
+        }
+
+        function renderChatMessages(chatId) {
+            const container = document.getElementById('chatMessages');
+            const messages = DB.messages[chatId] || [];
+
+            container.innerHTML = messages.map(msg => {
+                const isSent = msg.from === currentUser.name || msg.from === (ROLES[currentUser.role]?.label || 'Пользователь');
+                const sender = isSent ? 'sent' : 'received';
+                const name = msg.from === 'system' ? 'Система' : msg.from;
+                return `
+                    <div class="chat-msg ${sender}">
+                        ${msg.from !== 'system' ? '<strong>' + name + '</strong><br>' : ''}
+                        ${msg.text}
+                        <span class="msg-time">${msg.time || ''}</span>
+                    </div>
+                `;
+            }).join('');
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !currentChatId) return;
+
+            if (!DB.messages[currentChatId]) {
+                DB.messages[currentChatId] = [];
+            }
+
+            const msg = {
+                from: currentUser.name || (ROLES[currentUser.role]?.label || 'Пользователь'),
+                text: text,
+                time: new Date().toISOString().slice(0, 16).replace('T', ' ')
+            };
+
+            DB.messages[currentChatId].push(msg);
+            input.value = '';
+            renderChatMessages(currentChatId);
+
+            // Имитация ответа
+            setTimeout(() => {
+                const replies = [
+                    'Принято!', 'Хорошо, сделаем.', 'Понял, спасибо.', 'Будет выполнено.',
+                    'Ожидайте, готовим.', 'В работе.', 'Уже делаем.', 'Отлично!'
+                ];
+                const reply = {
+                    from: 'Система',
+                    text: replies[Math.floor(Math.random() * replies.length)],
+                    time: new Date().toISOString().slice(0, 16).replace('T', ' ')
+                };
+                DB.messages[currentChatId].push(reply);
+                renderChatMessages(currentChatId);
+            }, 1000 + Math.random() * 2000);
+        }
+
+        function getChatLast(chatId) {
+            const msgs = DB.messages[chatId] || [];
+            if (msgs.length === 0) return 'Нет сообщений';
+            const last = msgs[msgs.length - 1];
+            return last.text.length > 30 ? last.text.slice(0, 30) + '...' : last.text;
+        }
+
+        function getChatUnread(chatId) {
+            // В демо-версии просто показываем количество
+            const msgs = DB.messages[chatId] || [];
+            const unread = msgs.filter(m => m.from !== 'system' && m.from !== (currentUser.name || 'Пользователь'));
+            return unread.length > 0 ? unread.length : 0;
+        }
+
+        // ============================================================
+        //  ЗАПУСК ПРИЛОЖЕНИЯ
+        // ============================================================
+
+        initDB();
+        showAuthScreen(true);
+
+        console.log('✅ ЦМТО Кунцево PRO - Приложение загружено');
+        console.log('📌 Доступные роли: директор, диспетчер, warehouse, site, gbuz, stock');
+        console.log('📌 Для входа используйте любой телефон или email');
+
+        // Для демо: автоматический вход тестовым пользователем
+        console.log('📌 Демо-режим: нажмите "Продолжить" с любым телефоном');
+    </script>
+
+</body>
+</html>
